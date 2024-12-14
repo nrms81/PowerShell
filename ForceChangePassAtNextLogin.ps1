@@ -22,19 +22,23 @@
 # В данном случае для поиска используется весь домен в котором запущен скрипт. В большенстве случаев, применительно к средним и мелким конторам, этого достаточно.
 # Если необходимо искать в определенном контейнере замените значение переменной на необходимый вам путь, как показано ниже:
 # $SearchBase = "OU=Accounts,DC=consoto,DC=com"
+
 $SearchBase = (Get-ADRootDSE).defaultNamingContext
 
 # Пароли установленные на дату $Begin будут подлежать замене при входе пользователя
 # $Begin получатся методом вычитания от текущей даты максимального срока действия пароля из политики домена по умолчанию
 # Далее $Begin будет сравниватся с датой установки пароля.
+
 $Begin = (Get-Date).Date.AddDays(-(Get-ADDefaultDomainPasswordPolicy).MaxPasswordAge.Days)
 
 # $End - следующая дата после $Begin
+
 $End = $Begin.AddDays(1)
 
 # Учетные записи значения атрибута "name" которых перечислено в данном списке, будут исключены из обработки 
-$SkipList = @("Administrator",
-			"Администратор")
+
+$SkipList = 	@("Administrator",
+		"Администратор")
 
 # Получаем список пользователей из контейнера $SearchBase со следюущими условиями:
 # "Enabled -eq $True" - учетная запись включена
@@ -42,18 +46,23 @@ $SkipList = @("Administrator",
 # "PasswordLastSet -ge $Begin" - время установки пароля больше или равно $Begin
 # "PasswordLastSet -lt $End" - но меньше чем $End
 # т.е. получаем учетные записи у которых время установки пароля с 00.00.00 по 23.59.59 на дату полученную в $Begin
+
 $Users = Get-ADUser -SearchBase $SearchBase -Filter {Enabled -eq $True -and PasswordNeverExpires -eq $False -and PasswordLastSet -ge $Begin -and PasswordLastSet -lt $End}
 
 # Если количество полученных учетных записей больше 0, то
+
 If ($Users.Count -gt 0) {
 
 # Перебераем учетные записи
+
     ForEach ($User in $Users) {
 
 # Если атрибут "name" не в списке $SkipList, то
+
 		If (!($Skiplist -contains $User.Name)) {
 
 # Устанавливаем флажок "Требовать смену пароля при следующем входе в систему"
+
 			Set-ADUser $User -ChangePasswordAtLogon:$True
 		}
     }
