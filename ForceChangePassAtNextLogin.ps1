@@ -27,7 +27,7 @@ $SearchBase = (Get-ADRootDSE).defaultNamingContext
 
 # Пароли установленные на дату $Begin будут подлежать замене при входе пользователя
 # $Begin получатся методом вычитания от текущей даты максимального срока действия пароля из политики домена по умолчанию
-# Далее $Begin будет сравниваться с датой установки пароля.
+# Далее $Begin будет сравниваться с датой установки пароля
 
 $Begin = (Get-Date).Date.AddDays(-(Get-ADDefaultDomainPasswordPolicy).MaxPasswordAge.Days)
 
@@ -37,7 +37,7 @@ $End = $Begin.AddDays(1)
 
 # Учетные записи значения атрибута "name" которых перечислено в данном списке, будут исключены из обработки 
 
-$SkipList = 	@("Administrator",
+$SkipList =	@("Administrator",
 		"Администратор")
 
 # Получаем список пользователей из контейнера $SearchBase со следующими условиями:
@@ -53,17 +53,13 @@ $Users = Get-ADUser -SearchBase $SearchBase -Filter {Enabled -eq $True -and Pass
 
 If ($Users.Count -gt 0) {
 
-# Перебираем учетные записи
+# Перебираем учетные записи. Если атрибут "name" не в списке $SkipList, то устанавливаем флажок "Требовать смену пароля при следующем входе в систему"
 
     ForEach ($User in $Users) {
-
-# Если атрибут "name" не в списке $SkipList, то
-
 		If (!($Skiplist -contains $User.Name)) {
-
-# Устанавливаем флажок "Требовать смену пароля при следующем входе в систему"
-
 			Set-ADUser $User -ChangePasswordAtLogon:$True
 		}
     }
 }
+
+
