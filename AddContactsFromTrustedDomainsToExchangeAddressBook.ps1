@@ -325,6 +325,7 @@ ForEach ($TrustedDomain in $TrustedDomains) {
 
 # Создаем контакт в Active Directory
 
+				$NewContact = $null
 				$NewContact = New-ADObject -Type "Contact" -Name $User.displayname -otherAttributes $AttributesForNewContact -Path $TrustedDomainOU -PassThru -Confirm:$false -Server $PDC
 
 # Создаем на основе этого контакта почтовый контакт на сервере Exchange
