@@ -241,7 +241,7 @@ ForEach ($TrustedDomain in $TrustedDomains) {
 							
 						If (($User.$Attribute.Count -gt 0) -and ($Contact.$Attribute.Count -eq 0)) {
 							If ($User.$Attribute.GetType().Name -eq "ADPropertyValueCollection") {
-								$$ValueCollectionAdd = @()
+								$ValueCollectionAdd = @()
 								ForEach ($Value in $User.$Attribute.Value) {
 									$ValueCollectionAdd = $ValueCollectionAdd + $Value
 								}
